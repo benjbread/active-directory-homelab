@@ -10,6 +10,7 @@ Each card connects the concept to what a user would experience and how I would t
 - [-] DNS (Domain Name System) — Steps 1, 6, 12
 - [-] APIPA (169.254.x.x addresses) — Steps 1, 5
 - [-] Static vs. dynamic IP addressing — Steps 1, 5
+- [x] File Hash / SHA 256 - Step 2
 - [ ] Subnet mask (/24) — Step 5
 - [ ] Default gateway — Steps 5, 9
 - [-] SRV records — Steps 1, 12
@@ -104,6 +105,28 @@ The DNS is set to one that doesn't contain the correct SRV records to contact th
 https://www.cloudflare.com/learning/dns/what-is-dns/
 
 ---
+
+## File Hash (SHA 256)
+
+**In one sentence (my words):** Creates a 256 bit hash value for an input of any size using a mathematical algorithm.
+
+**Everyday analogy:** This is like a human fingerprint
+
+**Where it lives in my lab:** This is used for hash checking. In our lab I checked the hash of my Windows 11 Evaluation edition and checked it against the one provoided.
+
+**What a user would notice if it broke:** If the hash's didn't match this could mean a few things: 1. file download corrupted, 2. file tampered with, 3. file isn't complete 
+
+**Command to check it:** Get-FileHash .\filename.ext (uses SHA 256 by default)
+
+**Interview question it answers:** What is the difference between SHA-256 and Encryption?
+
+**My answer:** With encryption you can still recover the data, while with a file hash you can only verify integrity.
+
+**Source(s):**
+https://www.quora.com/What-is-a-hash-mismatch
+
+---
+
 
 ## Blank card (copy this for each new concept)
 
