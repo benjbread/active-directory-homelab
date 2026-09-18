@@ -22,7 +22,7 @@ Crop to the relevant window, and never capture real passwords or personal accoun
 
 **Setup**
 - [X] 01 – Plan the lab
-- [ ] 02 – Install VirtualBox and download ISOs
+- [X] 02 – Install VirtualBox and download ISOs
 
 **Domain controller**
 - [ ] 03 – Create the DC virtual machine
