@@ -89,8 +89,8 @@ A working Windows network needs four core services. In this lab, the DC provides
 - **RAS/NAT** - Routes internal traffic to the internet. NAT lets clients share the DC's internet-facing IP instead of their private 172.16.x.x addresses.
 
 **Proof:**
-- screenshots/step01-host-specs.png
-- diagram/network_diagram.png
+- `screenshots/step01-host-specs.png`
+- `diagram/network_diagram.png`
 
 **Problems & fixes:**
 8 GB of RAM was the only problem really but it will end up being more of just a slowdown. While creating VM's I will only have the one being made running and then the client drops from 4GB to 3GB RAM after its install. The DC stays at 2GB the whole time. I can't avoid running both VMs at once forever, the DC has to be on when the client joins the domain.
@@ -126,7 +126,36 @@ A working Windows network needs four core services. In this lab, the DC provides
 
 ---
 
-## Blank entry (copy this for each new step)
+## Step 02 – VirtualBox Prep
+
+**Date:** 9/18/2026
+**Time spent:** 30 minutes
+
+**Goal:** Install VirtualBox and download the ISOs for Windows 11 Enterprise and Windows Server 2022.
+
+**What I did:**
+1. Installed VirtualBox 7.2.18 and confirmed the version (Help → About).
+2. Downloaded the Windows Server 2022 and Windows 11 Enterprise evaluation ISOs from Microsoft's Evaluation Center to `C:\ISOs`.
+3. Ran `Get-FileHash` on the Windows 11 ISO and compared it to the SHA-256 hash on Microsoft's download page. Result: [MATCHED / DID NOT MATCH].
+
+**Why it matters (my own words):**
+Downloading from Microsoft instead of a third-party site ensures the ISOs haven't been modified or bundled with malware. Checking the hash confirms the file wasn't corrupted or tampered with, so later install problems won't come from a bad ISO. The Server evaluation must also activate online within 10 days, which the DC will do through its internet-facing (NAT) NIC.
+
+**Proof:**
+- `screenshots/step02-virtualbox-version.png`
+- `screenshots/step02-iso-folder.png`
+- `screenshots/step02-hash-check.png`
+
+**Problems & fixes:**
+None.
+
+**Help desk / security connection:**
+- Hash checking protects integrity, one of the three parts of the CIA triad (confidentiality, integrity, availability).
+- VMs are used to isolate workloads, analyze malware safely, and enable rapid recovery from attacks. In this lab, snapshots let me roll back instantly when I break something.
+
+---
+
+## Blank entry
 
 ```
 ## Step NN – Title
