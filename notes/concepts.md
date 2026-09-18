@@ -5,14 +5,14 @@ Each card connects the concept to what a user would experience and how I would t
 
 ## Concept index
 
-- [ ] NAT (Network Address Translation) — Steps 1, 8
-- [ ] DHCP (Dynamic Host Configuration Protocol) — Steps 1, 9
-- [ ] DNS (Domain Name System) — Steps 1, 6, 12
-- [ ] APIPA (169.254.x.x addresses) — Steps 1, 5
-- [ ] Static vs. dynamic IP addressing — Steps 1, 5
+- [-] NAT (Network Address Translation) — Steps 1, 8
+- [-] DHCP (Dynamic Host Configuration Protocol) — Steps 1, 9
+- [-] DNS (Domain Name System) — Steps 1, 6, 12
+- [-] APIPA (169.254.x.x addresses) — Steps 1, 5
+- [-] Static vs. dynamic IP addressing — Steps 1, 5
 - [ ] Subnet mask (/24) — Step 5
 - [ ] Default gateway — Steps 5, 9
-- [ ] SRV records — Steps 1, 12
+- [-] SRV records — Steps 1, 12
 - [ ] Active Directory Domain Services (AD DS) — Step 6
 - [ ] Domain, forest, and domain controller — Step 6
 - [ ] Organizational Unit (OU) — Steps 7, 14
@@ -38,7 +38,7 @@ Each card connects the concept to what a user would experience and how I would t
 This lives in the DC VM, part of the "Remote Access" role. NIC 1 faces the internet and NIC 2 is internal facing.
 
 **What a user would notice if it broke:**
-Users would lose the ability to access the internet.
+Users would lose the ability to access the internet but still have access to anything on the private network (logging in, reaching the DC, and shared drives still work)
 
 **Command to check it:**
 <!-- Leave blank for now. You'll fill this in during Step 12. -->
@@ -46,7 +46,7 @@ Users would lose the ability to access the internet.
 **Interview question it answers:** How do computers with private IP addresses reach the internet?
 
 **My answer:**
-It gets translated by NAT into the shared public IP used by the router.
+It gets translated by NAT into the shared public IP used by the router (in this lab the DC is the router), and then the IP that made the request is stored so it can be properly returned.
 
 **Source(s):**
 https://www.geeksforgeeks.org/computer-networks/advantages-and-disadvantages-of-nat/
@@ -56,15 +56,15 @@ https://www.reddit.com/r/techsupport/comments/yln3j6/question_about_network_addr
 
 ## DHCP (Dynamic Host Configuration Protocol)
 
-**In one sentence (my words):** This is a network management protocol that will automatically assign IP's (within set range) to clients and apply relevent network configuration settings.
+**In one sentence (my words):** This is a network management protocol that will automatically assign IPs (within set range) to clients and apply relevant network configuration settings.
 
-**Everyday analogy:** This is like when you start looking for a match on Fortnite and it automatically identifies what location your in (for server), your rank, etc. and places you in the proper matchmaking queue. Without it, its more like Minecraft where you manually enter the servers IP and Port before joining.
+**Everyday analogy:** This is like when you start looking for a match on Fortnite and it automatically identifies what location you're in (for server), your rank, etc. and places you in the proper matchmaking queue. Without it, its more like Minecraft where you manually enter the servers IP and Port before joining.
 
 **Where it lives in my lab:**
-This lives on the DC, and for my lab the range will be 172.16.0.100-200. The two options that points clients to the DC are the 'router' field and DNS 'field'.
+This lives on the DC, and for my lab the range will be 172.16.0.100-200. The two options that points clients to the DC are the 'router' field and 'DNS' field.
 
 **What a user would notice if it broke:**
-If DHCP broke, the client would find themselves with an 169.254 address, meaning they couldn't get an IP from the router.
+If DHCP broke, the client would find themselves with an 169.254 address, meaning they couldn't get an IP from the DHCP server.
 
 **Command to check it:**
 <!-- Leave blank for now. You'll fill this in during Step 12. -->
@@ -72,7 +72,7 @@ If DHCP broke, the client would find themselves with an 169.254 address, meaning
 **Interview question it answers:** A user's IP address starts with 169.254. What does that tell you, and what do you check first?
 
 **My answer:**
-This tells me the user's device isn't able to get an IP assigned by the router, usually mean DHCP is broken and isn't handing out IP's.
+This tells me the user's device isn't able to get an IP assigned by the DHCP server, usually mean DHCP is broken and isn't handing out IPs.
 
 **Source(s):**
 https://www.whatismyip.com/169-254-ip-address/
@@ -84,13 +84,13 @@ https://www.geeksforgeeks.org/computer-networks/dynamic-host-configuration-proto
 
 **In one sentence (my words):** DNS translates human readable names to the numerical IP addresses (or vice versa).
 
-**Everyday analogy:** Like when you find a name from a phone number (via phone book or google)
+**Everyday analogy:** Like when you find a phone number from a name (via phone book or google)
 
 **Where it lives in my lab:**
 This lives on the DC and the DC uses its loopback address as its own DNS server while clients use the DC's Internal facing IP.
 
 **What a user would notice if it broke:**
-"An Active Directory Domain Controller (AD DC) for the domain 'mydomain.com' could not be contacted.", meaning even if can connect to internet they cannot retrieve SRV records to confirm.
+"An Active Directory Domain Controller (AD DC) for the domain 'mydomain.com' could not be contacted.", meaning even if can connect to internet they cannot retrieve SRV records to confirm. Also, websites wouldn't load by name.
 
 **Command to check it:**
 <!-- Leave blank for now. You'll fill this in during Step 12. -->
