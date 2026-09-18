@@ -26,7 +26,7 @@ Crop to the relevant window, and never capture real passwords or personal accoun
 
 **Domain controller**
 - [X] 03 – Create the DC virtual machine
-- [ ] 04 – Install Windows Server and Guest Additions
+- [X] 04 – Install Windows Server and Guest Additions
 - [ ] 05 – Configure network adapters, static IP, and server name
 - [ ] 06 – Install AD DS and promote to domain controller
 - [ ] 07 – Create admin OU and domain admin account
@@ -185,6 +185,40 @@ None.
 
 **Help desk / security connection:**
 Real servers often have multiple network adapters to keep networks separate. For example, one faces users and another is only for administration. Separating networks like this is a basic security practice (network segmentation).
+
+---
+
+## Step 04 – Install Windows Server and Guest Additions
+
+**Date:** 9/18/2026
+**Time spent:** 15 minutes
+
+**Goal:** Install Windows Server 2022 Standard Evaluation (Desktop Experience) and install Guest Additions.
+
+**What I did:**
+1. Started the DC VM and selected Windows Server 2022 Standard Evaluation (Desktop Experience).
+2. Set the Administrator password to something easy to type, since I'll use it often in the lab. (In a real environment, this password should be strong.)
+3. Installed Guest Additions from the CD image, then fully shut down and restarted the VM. Verified that the mouse was smooth and the resolution adjusted when resizing the window.
+4. Took a VM snapshot named "Fresh Install + Guest Additions."
+
+**Why it matters (my own words):**
+Server Core is often preferred for production servers because Desktop Experience uses more RAM and disk, needs more patches, and has a larger attack surface. For this lab, I'm using Desktop Experience because it's faster to navigate and easier to screenshot for documentation. Guest Additions makes mouse movement and window resizing work properly in the VM. The snapshot gives me a clean rollback point if a later step goes wrong.
+
+**Proof:**
+- `screenshots/step04-winver.png`
+- `screenshots/step04-snapshot.png`
+
+**Problems & fixes:**
+None.
+
+**What I got wrong at first → what I learned:**
+1. **Server Core's benefits**
+   - **I thought:** Server Core's advantages were a smaller attack surface and better privilege separation.
+   - **Actually:** The attack surface point is right. The other main benefits are fewer patches and reboots, and lower RAM and disk use.
+   - **Why it matters:** Knowing the real trade-offs lets me explain why a company would choose one over the other.
+
+**Help desk / security connection:**
+Without Guest Additions, the mouse lags and the resolution is stuck. That's the same thing you'd see on a real PC missing its graphics driver. Checking drivers is a standard help desk fix for display and mouse problems.
 
 ---
 
