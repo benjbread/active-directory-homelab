@@ -11,6 +11,7 @@ Each card connects the concept to what a user would experience and how I would t
 - [-] APIPA (169.254.x.x addresses) — Steps 1, 5
 - [-] Static vs. dynamic IP addressing — Steps 1, 5
 - [x] File Hash / SHA 256 - Step 2
+- [x] VirtualBox network modes (NAT vs. Internal Network) - Step 3
 - [ ] Subnet mask (/24) — Step 5
 - [ ] Default gateway — Steps 5, 9
 - [-] SRV records — Steps 1, 12
