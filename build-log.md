@@ -155,6 +155,39 @@ None.
 
 ---
 
+## Step 03 – Create the DC virtual machine
+
+**Date:** 9/18/2026
+**Time spent:** 30 minutes
+
+**Goal:** Create the DC VM, set its hardware, and configure its two NICs to use NAT and Internal Network respectively.
+
+**What I did:**
+1. Created a VM named `DC` using the Windows Server 2022 ISO, and checked "Skip Unattended Installation" so I could install Windows manually.
+2. Configured 2048 MB of RAM, 2 CPU cores, and a 50 GB disk (not pre-allocated, so it only grows as space is used).
+3. Set Shared Clipboard and Drag'n'Drop to Bidirectional.
+4. Configured two network adapters: Adapter 1 on NAT and Adapter 2 on Internal Network (`intnet`).
+
+**Why it matters (my own words):**
+Two network adapters let the DC 1) connect to the internet and 2) host a private network for the client VMs. The internal network is isolated, so lab services like the DC's DHCP server can't affect my real home network.
+
+**Proof:**
+- `screenshots/step03-dc-vm-settings.png`
+
+**Problems & fixes:**
+None.
+
+**What I got wrong at first → what I learned:**
+1. **Which setting must match between the DC and the client**
+   - **I thought:** The client's "router" and "DNS" fields had to match the DC.
+   - **Actually:** Those are Windows settings that DHCP hands out. At the VirtualBox level, the internal network *name* (`intnet`) must match. It works like plugging both machines into the same switch.
+   - **Why it matters:** If the names don't match (e.g., `intnet2`), the client lands on a separate isolated network, can't reach DHCP, and ends up with a 169.254.x.x (APIPA) address.
+
+**Help desk / security connection:**
+Real servers often have multiple network adapters to keep networks separate. For example, one faces users and another is only for administration. Separating networks like this is a basic security practice (network segmentation).
+
+---
+
 ## Blank entry
 
 ```
