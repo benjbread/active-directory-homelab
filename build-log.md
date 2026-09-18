@@ -25,7 +25,7 @@ Crop to the relevant window, and never capture real passwords or personal accoun
 - [X] 02 – Install VirtualBox and download ISOs
 
 **Domain controller**
-- [ ] 03 – Create the DC virtual machine
+- [X] 03 – Create the DC virtual machine
 - [ ] 04 – Install Windows Server and Guest Additions
 - [ ] 05 – Configure network adapters, static IP, and server name
 - [ ] 06 – Install AD DS and promote to domain controller
