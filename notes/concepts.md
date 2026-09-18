@@ -31,9 +31,11 @@ Each card connects the concept to what a user would experience and how I would t
 
 ## NAT (Network Address Translation)
 
-**In one sentence (my words):** Allows multiple devices in the same private network to access the internet using one shared public IP.
+**In one sentence (my words):**
+Allows multiple devices in the same private network to access the internet using one shared public IP.
 
-**Everyday analogy:** At the bar with your friends you all get on one tab instead of paying seperatly.
+**Everyday analogy:**
+At the bar with your friends you all get on one tab instead of paying seperatly.
 
 **Where it lives in my lab:**
 This lives in the DC VM, part of the "Remote Access" role. NIC 1 faces the internet and NIC 2 is internal facing.
@@ -44,7 +46,8 @@ Users would lose the ability to access the internet but still have access to any
 **Command to check it:**
 <!-- Leave blank for now. You'll fill this in during Step 12. -->
 
-**Interview question it answers:** How do computers with private IP addresses reach the internet?
+**Interview question it answers:** 
+How do computers with private IP addresses reach the internet?
 
 **My answer:**
 It gets translated by NAT into the shared public IP used by the router (in this lab the DC is the router), and then the IP that made the request is stored so it can be properly returned.
@@ -57,9 +60,11 @@ https://www.reddit.com/r/techsupport/comments/yln3j6/question_about_network_addr
 
 ## DHCP (Dynamic Host Configuration Protocol)
 
-**In one sentence (my words):** This is a network management protocol that will automatically assign IPs (within set range) to clients and apply relevant network configuration settings.
+**In one sentence (my words):** 
+This is a network management protocol that will automatically assign IPs (within set range) to clients and apply relevant network configuration settings.
 
-**Everyday analogy:** This is like when you start looking for a match on Fortnite and it automatically identifies what location you're in (for server), your rank, etc. and places you in the proper matchmaking queue. Without it, its more like Minecraft where you manually enter the servers IP and Port before joining.
+**Everyday analogy:** 
+This is like when you start looking for a match on Fortnite and it automatically identifies what location you're in (for server), your rank, etc. and places you in the proper matchmaking queue. Without it, its more like Minecraft where you manually enter the servers IP and Port before joining.
 
 **Where it lives in my lab:**
 This lives on the DC, and for my lab the range will be 172.16.0.100-200. The two options that points clients to the DC are the 'router' field and 'DNS' field.
@@ -70,7 +75,8 @@ If DHCP broke, the client would find themselves with an 169.254 address, meaning
 **Command to check it:**
 <!-- Leave blank for now. You'll fill this in during Step 12. -->
 
-**Interview question it answers:** A user's IP address starts with 169.254. What does that tell you, and what do you check first?
+**Interview question it answers:** 
+A user's IP address starts with 169.254. What does that tell you, and what do you check first?
 
 **My answer:**
 This tells me the user's device isn't able to get an IP assigned by the DHCP server, usually mean DHCP is broken and isn't handing out IPs.
@@ -83,9 +89,11 @@ https://www.geeksforgeeks.org/computer-networks/dynamic-host-configuration-proto
 
 ## DNS (Domain Name System)
 
-**In one sentence (my words):** DNS translates human readable names to the numerical IP addresses (or vice versa).
+**In one sentence (my words):**
+DNS translates human readable names to the numerical IP addresses (or vice versa).
 
-**Everyday analogy:** Like when you find a phone number from a name (via phone book or google)
+**Everyday analogy:** 
+Like when you find a phone number from a name (via phone book or google)
 
 **Where it lives in my lab:**
 This lives on the DC and the DC uses its loopback address as its own DNS server while clients use the DC's Internal facing IP.
@@ -96,7 +104,8 @@ This lives on the DC and the DC uses its loopback address as its own DNS server 
 **Command to check it:**
 <!-- Leave blank for now. You'll fill this in during Step 12. -->
 
-**Interview question it answers:** A computer can browse the internet but can't join the domain. What's the most likely cause?
+**Interview question it answers:** 
+A computer can browse the internet but can't join the domain. What's the most likely cause?
 
 **My answer:**
 The DNS is set to one that doesn't contain the correct SRV records to contact the domain.
@@ -108,25 +117,63 @@ https://www.cloudflare.com/learning/dns/what-is-dns/
 
 ## File Hash (SHA 256)
 
-**In one sentence (my words):** Creates a 256 bit hash value for an input of any size using a mathematical algorithm.
+**In one sentence (my words):** 
+Creates a 256 bit hash value for an input of any size using a mathematical algorithm.
 
-**Everyday analogy:** This is like a human fingerprint
+**Everyday analogy:** 
+This is like a human fingerprint
 
-**Where it lives in my lab:** This is used for hash checking. In our lab I checked the hash of my Windows 11 Evaluation edition and checked it against the one provoided.
+**Where it lives in my lab:** 
+This is used for hash checking. In our lab I checked the hash of my Windows 11 Evaluation edition and checked it against the one provoided.
 
-**What a user would notice if it broke:** If the hash's didn't match this could mean a few things: 1. file download corrupted, 2. file tampered with, 3. file isn't complete 
+**What a user would notice if it broke:** 
+If the hash's didn't match this could mean a few things: 1. file download corrupted, 2. file tampered with, 3. file isn't complete 
 
-**Command to check it:** Get-FileHash .\filename.ext (uses SHA 256 by default)
+**Command to check it:** 
+Get-FileHash .\filename.ext (uses SHA 256 by default)
 
-**Interview question it answers:** What is the difference between SHA-256 and Encryption?
+**Interview question it answers:** 
+What is the difference between SHA-256 and Encryption?
 
-**My answer:** With encryption you can still recover the data, while with a file hash you can only verify integrity.
+**My answer:** 
+With encryption you can still recover the data, while with a file hash you can only verify integrity.
 
 **Source(s):**
 https://www.quora.com/What-is-a-hash-mismatch
 
 ---
 
+## VirtualBox network modes (NAT vs. Internal Network)
+
+**In one sentence (my words):**
+NAT connects a single VM to the internet hidden behind the host's network address, while an Internal Network lets multiple VMs reach each other while staying isolated from the host and the internet.
+
+**Everyday analogy:**
+NAT is like using the company mailroom to send and receive your mail. The Internal Network is like the company intercom: it works inside the building but not outside.
+
+**Where it lives in my lab:**
+The DC's Adapter 1 uses VirtualBox NAT, which gives the DC internet access through my host. The DC's Adapter 2 and the client's adapter both use the Internal Network named `intnet`, so they share an isolated virtual network. The client never uses VirtualBox NAT directly. It reaches the internet through the DC's own Windows NAT (Remote Access role), which forwards its traffic out Adapter 1.
+
+**What a user would notice if it broke:**
+- **Adapter 1 set wrong:** The DC and all clients lose internet, but domain logins and DHCP still work because they stay on the internal network.
+- **Internal network name mismatch** (e.g., `intnet` vs. `intnet2`): The client gets a 169.254.x.x (APIPA) address and can't reach the DC, the domain, or the internet.
+
+**Command to check it:**
+- In VirtualBox: Settings → Network, and confirm each adapter's mode and network name.
+- Inside the VM: `ipconfig`. The VirtualBox NAT adapter shows a 10.0.2.x address (VirtualBox's default NAT range). The internal adapter shows 172.16.0.x, or 169.254.x.x if it can't reach DHCP.
+
+**Interview question it answers:** Why would you put lab or test VMs on an isolated internal network instead of connecting them directly to your real network?
+
+**My answer:**
+Isolation keeps lab services from affecting the real network. For example, my DC runs a DHCP server. On my home network, it could hand out wrong addresses to real devices and break their connections. Isolation also contains risky activity, like malware testing, so it can't spread. The most important takeaway is that its like a separate network for testing that wont affect our real network.
+
+**What I got wrong at first:**
+I thought the client used VirtualBox NAT to reach the internet. It actually uses the DC's Windows NAT, which then sends traffic out the DC's VirtualBox NAT adapter. There are two separate NAT layers.
+
+**Source(s):**
+VirtualBox User Manual – Virtual Networking chapter (virtualbox.org/manual)
+
+---
 
 ## Blank card (copy this for each new concept)
 
