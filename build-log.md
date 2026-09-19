@@ -2,9 +2,6 @@
 
 Step-by-step record of building a Windows Server Active Directory environment in VirtualBox and resolving common help desk tickets, including the problems I hit and how I solved them.
 
-<!-- Screenshots: save to screenshots/ as stepNN-description.png (e.g., step05-static-ip.png).
-Crop to the relevant window, and never capture real passwords or personal accounts. -->
-
 ## Lab environment
 
 | Component | Details |
@@ -219,6 +216,42 @@ None.
 
 **Help desk / security connection:**
 Without Guest Additions, the mouse lags and the resolution is stuck. That's the same thing you'd see on a real PC missing its graphics driver. Checking drivers is a standard help desk fix for display and mouse problems.
+
+---
+
+## Step 05 – Configure network adapters, static IP, and server name
+
+**Date: 9/19/2026**
+**Time spent: 30 Minutes**
+
+**Goal: Configure network adapters name, set IPv4 properties for Internal adapter, and server name**
+
+**What I did:**
+1. Went to "about" section of settings and renamed device "DC".
+2. Opened network connections and identified adapter IP starting with 169.254.x.x as Internal and the one with 10.0.2.x is Internet, then renamed them "_Internal" and "Internet" respectivly.
+3. Opened IPv4 properties of Internal adapter and set static IP (172.16.0.1), subnet (255.255.255.0), and DNS (127.0.0.1, loopback).
+4. Restarted VM and confirmed settings applied with `hostname` and `ipconfig /all`.
+
+**Why it matters (my own words):**
+Renaming the server "DC" is important later as it makes it easier to distinguish against other machines in our lab. The same applies for renaming the adapters as being able to quickly know which adapter is which down the line will save lots of time. The Internal Network adapter's IPv4 properties were important to set as the DC can't get an address from its own DHCP server so it needs a static one. This IP is then used for clients default gateway and DNS server so it must not be changing on them. We don't configure it to have a default gateway as NIC 1 already does and NIC 2 wouldn't allow requests to reach the internet. We use the loopback address for DNS as our DC will run our DNS once AD is installed.
+
+**Proof:**
+- `screenshots/step05-ipconfig.png`
+
+**Problems & fixes:**
+None.
+
+**What I got wrong at first → what I learned:**
+1. **Why the internal adapter has no gateway**
+   - **I thought:** It was blank because the DC acts as the default gateway for the clients.
+   - **Actually:** The DC's own internet traffic already exits through INTERNET, which has its own gateway. A second gateway on _INTERNAL could send traffic into the isolated network, where it can't reach the internet.
+   - **Why it matters:** A machine should have only one default gateway.
+
+**Help desk / security connection:**
+The `ipconfig /all` fields a help desk tech reads first when a user says "the internet is down,":
+1. Media State: This will say "Media disconnected" if the cable is unplugged or WiFi is off.
+2. IPv4 Address: A 169.254.x.x means the device cannot reach the DHCP server to get a valid lease.
+3. Default Gateway: If this is empty the computer has no path to send traffic outside the local private network.
 
 ---
 
