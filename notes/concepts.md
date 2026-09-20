@@ -5,16 +5,16 @@ Each card connects the concept to what a user would experience and how I would t
 
 ## Concept index
 
-- [-] NAT (Network Address Translation) — Steps 1, 8
-- [-] DHCP (Dynamic Host Configuration Protocol) — Steps 1, 9
-- [-] DNS (Domain Name System) — Steps 1, 6, 12
-- [-] APIPA (169.254.x.x addresses) — Steps 1, 5
-- [-] Static vs. dynamic IP addressing — Steps 1, 5
-- [x] File Hash / SHA 256 - Step 2
-- [x] VirtualBox network modes (NAT vs. Internal Network) - Step 3
-- [ ] Subnet mask (/24) — Step 5
+## Concept index
+
+- [ ] NAT (Network Address Translation) — Steps 1, 8 *(draft, fixes pending)*
+- [ ] DHCP (Dynamic Host Configuration Protocol) — Steps 1, 9 *(draft, fixes pending; also covers APIPA and static vs. dynamic addressing)*
+- [ ] DNS (Domain Name System) — Steps 1, 6, 12 *(draft, fixes pending; also covers SRV records)*
+- [x] File hash (SHA-256) — Step 2
+- [x] VirtualBox network modes (NAT vs. Internal Network) — Step 3
+- [ ] Server Core vs. Desktop Experience — Step 4
 - [ ] Default gateway — Steps 5, 9
-- [-] SRV records — Steps 1, 12
+- [ ] Subnet mask (/24) — Step 9
 - [ ] Active Directory Domain Services (AD DS) — Step 6
 - [ ] Domain, forest, and domain controller — Step 6
 - [ ] Organizational Unit (OU) — Steps 7, 14
@@ -82,6 +82,18 @@ A user's IP address starts with 169.254. What does that tell you, and what do yo
 **My answer:**
 This tells me the user's device isn't able to get an IP assigned by the DHCP server, usually mean DHCP is broken and isn't handing out IPs.
 
+**Related: APIPA (169.254.x.x)**
+- **What it is:** Allows a device to automatically assign itself an IP address.
+- **When a machine assigns it to itself:** When the device can't reach a DHCP server.
+- **What it tells a help desk tech:** 1. Either the DHCP server is unreachable or misconfigured. 2. Device is on the wrong network 3. DHCP scope ran out of addresses.
+- **Where I saw it in this lab:** Before I set the static IP for NIC 2 on the DC.
+
+**Related: Static vs. dynamic addressing**
+- **Static:** A non changing IP, used on the DC's NIC 2 so that clients always reach the right thing.
+- **Dynamic:** A changing IP from the DHCP server, used on the clients.
+- **Why the DC must be static:** The DC is the DHCP server so it can't get an address assigned from itself. Also, clients will be using it for routing and DNS so they must always be able to reach it at the same place.
+- **What breaks if a server's static IP changes:** Its connection to client devices.
+
 **Source(s):**
 https://www.whatismyip.com/169-254-ip-address/
 https://www.geeksforgeeks.org/computer-networks/dynamic-host-configuration-protocol-dhcp/
@@ -110,6 +122,13 @@ A computer can browse the internet but can't join the domain. What's the most li
 
 **My answer:**
 The DNS is set to one that doesn't contain the correct SRV records to contact the domain.
+
+**Related: SRV records**
+- **What they are:** A record in the DNS.
+- **What they tell a client:** Tells clients where to find specific services without relying on default ports.
+- **Where they live in this lab:** They live on the DC as it acts as our networks DNS.
+- **Why 8.8.8.8 can't provide them:** While other DNS IPs might allow access to the internet they will lack the SRVs to get access to local services.
+- **What a user sees if the client can't find them:** They will experience connection timeouts, "server not found: errors, or set up failures all because they cannot automatically discover the specific hostname and port to run local services.
 
 **Source(s):**
 https://www.cloudflare.com/learning/dns/what-is-dns/
@@ -173,6 +192,64 @@ I thought the client used VirtualBox NAT to reach the internet. It actually uses
 
 **Source(s):**
 VirtualBox User Manual – Virtual Networking chapter (virtualbox.org/manual)
+
+---
+
+## Server Core vs. Desktop Experience
+
+**In one sentence (my words):** 
+Server core uses only CLI so its better for performance and security. Desktop Experience is easier to navigate for beginners since it uses a GUI which can be useful for documentation screenshots.
+
+**Everyday analogy:**
+Server Core is like a high-performance sports car stripped of features to maximize speed and efficiency, while Desktop Experience is the fully loaded luxury SUV equipped with all the comfort features and a heavy touchscreen dashboard.
+
+**Where it lives in my lab:**
+In my lab I used the Desktop Experience as documentation will be easier for screenshots and it will be faster for me as its more familiar.
+
+**Trade-offs:**
+The Desktop Experience is going need more RAM and disk use because of its larger codebase. This larger codebase also introduces the need for more patches meaning more reboots. The last main downside is more code = more to attack, basically the larger codebase creates more opportunity's for attackers to find a weakness. Server Core does have its own issues, mainly being its harder to learn and some software requires a desktop to operate.
+
+**How Server Core is managed without a desktop:**
+<!-- PowerShell remoting and Windows Admin Center. -->
+The Windows Admin Center gateway translates actions from its web-based GUI into PowerShell commands and WMI queries and executes them remotely via the Windows Remote Management service (WinRM).
+
+**Interview question it answers:** Why might a company run its servers without a graphical desktop?
+
+**My answer:**
+A server running without a GUI has less hardware requirements, better overall security, faster runtime, and since it has less code it needs fewer patches meaning fewer reboots.
+
+**What I got wrong at first:**
+None.
+
+**Source(s):**
+https://learn.microsoft.com/en-us/windows-server/manage/windows-admin-center/configure/use-powershell
+
+---
+
+## Default gateway
+
+**In one sentence (my words):** The device that client devices will use to send data to external networks or the internet (anything outside the private network basically).
+
+**Everyday analogy:**
+Imagine trying to leave a building with many doors (some leading to the entrance, some to the back, some to the garage, etc.), the default gateway would be the one that lets you access things outside that building (a.k.a the entrance/exit door).
+
+**Where it lives in my lab:**
+<!-- What's the gateway on the DC's INTERNET adapter? Why is _INTERNAL blank? What will clients get as their gateway, and from where? -->
+In the DC the INTERNET adapter's gateway is assigned from the VirtualBox's built-in NAT DHCP. We leave the _INTERNAL adapter blank since the DC already has the default gateway and adding one leading into the internal network would mean no access to the internet. Clients will use the DC's DHCP service to get their gateway assigned, which will route them through the DC to the internet.
+
+**What a user would notice if it broke:**
+<!-- What still works (local network) vs. what fails (internet)? -->
+A user would still be able to access local services (things on the local private network) but nothing outside of it (can't access the internet).
+
+**Command to check it:**
+`ipconfig /all`
+
+**Interview question it answers:** A user can reach devices on the local network but not the internet. What's one likely cause?
+
+**My answer:**
+<!-- watch josh vid 51-53 -->
+
+**Source(s):**
 
 ---
 
