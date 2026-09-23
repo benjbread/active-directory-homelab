@@ -13,10 +13,10 @@ Each card connects the concept to what a user would experience and how I would t
 - [x] File hash (SHA-256) — Step 2
 - [x] VirtualBox network modes (NAT vs. Internal Network) — Step 3
 - [ ] Server Core vs. Desktop Experience — Step 4
-- [ ] Default gateway — Steps 5, 9
+- [X] Default gateway — Steps 5, 9
 - [ ] Subnet mask (/24) — Step 9
 - [X] Active Directory Domain Services (AD DS) — Step 6
-- [ ] Domain, forest, and domain controller — Step 6 *(draft, fixes pending)*
+- [X] Domain, forest, and domain controller — Step 6
 - [ ] Organizational Unit (OU) — Steps 7, 14
 - [ ] Security groups — Steps 7, 14
 - [ ] Domain Admins and least privilege — Steps 7, 22
@@ -234,11 +234,9 @@ https://learn.microsoft.com/en-us/windows-server/manage/windows-admin-center/con
 Imagine trying to leave a building with many doors (some leading to the entrance, some to the back, some to the garage, etc.), the default gateway would be the one that lets you access things outside that building (a.k.a the entrance/exit door).
 
 **Where it lives in my lab:**
-<!-- What's the gateway on the DC's INTERNET adapter? Why is _INTERNAL blank? What will clients get as their gateway, and from where? -->
 In the DC the INTERNET adapter's gateway is assigned from the VirtualBox's built-in NAT DHCP. We leave the _INTERNAL adapter blank since the DC already has the default gateway and adding one leading into the internal network would mean no access to the internet. Clients will use the DC's DHCP service to get their gateway assigned, which will route them through the DC to the internet.
 
 **What a user would notice if it broke:**
-<!-- What still works (local network) vs. what fails (internet)? -->
 A user would still be able to access local services (things on the local private network) but nothing outside of it (can't access the internet).
 
 **Command to check it:**
@@ -247,9 +245,13 @@ A user would still be able to access local services (things on the local private
 **Interview question it answers:** A user can reach devices on the local network but not the internet. What's one likely cause?
 
 **My answer:**
-<!-- watch josh vid 51-53 -->
+One cause could be that the default gateway is misconfigured. You can check this by running `ipconfig /all` and checking the default gateways value. If its empty then the DHCP server isn't properly assigning the routing field. If its there but wrong then the DHCP server is misconfigured and giving out the wrong gateway. The last option would be its correct but the gateway device itself is down or misrouting. You can ping the gateway IP, and if it replies but the internet doesn't then you know the client config is correct and the issue is upstream.
+
+**What I got wrong at first:**
+None.
 
 **Source(s):**
+https://www.geeksforgeeks.org/computer-networks/default-gateway-in-networking/
 
 ---
 
@@ -296,29 +298,31 @@ https://learn.microsoft.com/en-us/training/paths/active-directory-domain-service
 
 **In one sentence each (my words):**
 - **Domain:** An area of a network organized by a single authoritative database.
-- **Domain controller:** The DC is the authority over AD objects, authentication, and changes. A Domain can have multiple DCs each with a copy of the AD and syncing changes to eachother.
-- **Forest:** The top of the heirarchy
+- **Domain controller:** The DC is the authority over AD objects, authentication, and changes. A Domain can have multiple DCs each with a copy of the AD and syncing changes to each other.
+- **Forest:** The top of the hierarchy
 
 **How they relate:**
 Forests hold 'trees', and trees are just collections of one or more domains. A forest can have one tree and still be a forest. A Domain can have multiple domain controllers but a domain controller can't belong to multiple domains. An organization might have multiple DCs for a domain so that if one goes down they have redundancy and services will remain running.
 
 **Everyday analogy:**
-If a domain is like an organizations building where workers have ID to get into their respective offices. Then a Forest would be like if that org had multiple buildings that all operate under the same company policies. The buildings cant belong to multiple organizations but the organization can have multiple buildings.
+If a domain is like an organizations building where workers have ID to get into their respective offices. Then a Forest would be like if that org had multiple buildings that all operate under the same company policies. The buildings can't belong to multiple organizations but the organization can have multiple buildings.
 
 **Where it lives in my lab:**
-List your specifics: the forest name, the domain name, the NetBIOS name, and your DC's hostname. Then note how many DCs you have, and what that means if it goes down.
-
-In my lab the forest is named `mydomain.com` since that's the name of the root domain, the domain is named `mydomain.com`, the NetBIOS name is `MYDOMAIN`, and the hostname is `DC`
+In my lab the forest is named `mydomain.com` since that's the name of the root domain, the domain is named `mydomain.com`, the NetBIOS name is `MYDOMAIN`, and the hostname is `DC`.
 
 **Why the forest matters for security:**
+By default a forest administrator won't have permissions in other forests. This is because the forest acts as the 'security boundary'. For sharing permissions between forests you must establish a 'forest trust'. They allow for the establishment of a trust relationship between two forests, enabling users in one forest to access resources in another, provided the appropriate permissions are assigned.
 
 **Interview question it answers:** What's the difference between a domain and a forest?
 
 **My answer:**
+A domain is an area of a network while a forest is one or more trees of domains. A forest acts as the top in the hierarchy, meaning it's the 'security boundary'. For forest-level admins this means everything under the forest is in their scope of control. Most small companies run one domain per forest since the forest acts as the boundary to help isolate environments. You'd add more domains when an area of the network is needed that will operate under a different set of rules, for example, when a company expands internationally and different laws apply to how work needs to be conducted.
 
 **What I got wrong at first:**
+None.
 
 **Source(s):**
+https://learn.microsoft.com/en-us/training/paths/active-directory-domain-services/
 
 ---
 
