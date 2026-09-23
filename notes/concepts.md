@@ -15,8 +15,8 @@ Each card connects the concept to what a user would experience and how I would t
 - [ ] Server Core vs. Desktop Experience — Step 4
 - [ ] Default gateway — Steps 5, 9
 - [ ] Subnet mask (/24) — Step 9
-- [ ] Active Directory Domain Services (AD DS) — Step 6
-- [ ] Domain, forest, and domain controller — Step 6
+- [X] Active Directory Domain Services (AD DS) — Step 6
+- [ ] Domain, forest, and domain controller — Step 6 *(draft, fixes pending)*
 - [ ] Organizational Unit (OU) — Steps 7, 14
 - [ ] Security groups — Steps 7, 14
 - [ ] Domain Admins and least privilege — Steps 7, 22
@@ -248,6 +248,75 @@ A user would still be able to access local services (things on the local private
 
 **My answer:**
 <!-- watch josh vid 51-53 -->
+
+**Source(s):**
+
+---
+
+## Active Directory Domain Services (AD DS)
+
+**In one sentence (my words):**
+Active Directory Domain Services is used for things like managing a network's authentication, locating computers and services, and applying GPOs.
+
+**Everyday analogy:**
+This would be like entering a company where they check your work ID at the entrance and allow you access to the part of the building you're supposed to work in.
+
+**Where it lives in my lab:**
+In my lab the DC runs AD DS. Using this I created the root forest mydomain.com, and the NetBIOS name was set to MYDOMAIN by default from the forest.
+
+**What it gives me that standalone computers don't:**
+1. Authenticating users and computers
+2. Locating computers by name
+3. Applying Group Policy Objects (GPOs)
+4. Discovering and locating local services
+5. Storing certain config data
+
+**What a user would notice if it broke:**
+If AD DS stopped working a user would no longer be able to authenticate (so they might claim their password isn't working, can't log in, etc.), they wouldn't be able to discover or locate local services, and GPOs wouldn't be in effect so they wouldn't have their typical permissions. Users may still get into their machines on cached credentials from a previous sign-in, so the first complaint is often "I can't reach the shared drive" rather than "I can't log in." In my lab the same machine also runs DNS and DHCP, so if the DC is down, all three go down together.
+
+**Command to check it:**
+- `whoami` – displays the currently logged in user
+- `nslookup -type=SRV _ldap._tcp.dc._msdcs.mydomain.com` – returns the SRV record for the domain
+- `dcdiag` – runs a health check on a domain controller
+
+**Interview question it answers:** What does Active Directory actually do for an organization?
+
+**My answer:**
+Active Directory is the central directory of an org's users, computers, and groups. Instead of each device keeping its own separate accounts, they are all stored in AD. This gives the company the power to enforce Group Policy Objects (GPOs), locate devices by human-readable names, and have single sign-on where one account works on any domain machine. It gives admins the ability to do things like disable an account everywhere from one server, instead of separately on every machine that user appears on.
+
+**What I got wrong at first:**
+None.
+
+**Source(s):**
+https://learn.microsoft.com/en-us/training/paths/active-directory-domain-services/
+
+---
+
+## Domain, forest, and domain controller
+
+**In one sentence each (my words):**
+- **Domain:** An area of a network organized by a single authoritative database.
+- **Domain controller:** The DC is the authority over AD objects, authentication, and changes. A Domain can have multiple DCs each with a copy of the AD and syncing changes to eachother.
+- **Forest:** The top of the heirarchy
+
+**How they relate:**
+Forests hold 'trees', and trees are just collections of one or more domains. A forest can have one tree and still be a forest. A Domain can have multiple domain controllers but a domain controller can't belong to multiple domains. An organization might have multiple DCs for a domain so that if one goes down they have redundancy and services will remain running.
+
+**Everyday analogy:**
+If a domain is like an organizations building where workers have ID to get into their respective offices. Then a Forest would be like if that org had multiple buildings that all operate under the same company policies. The buildings cant belong to multiple organizations but the organization can have multiple buildings.
+
+**Where it lives in my lab:**
+List your specifics: the forest name, the domain name, the NetBIOS name, and your DC's hostname. Then note how many DCs you have, and what that means if it goes down.
+
+In my lab the forest is named `mydomain.com` since that's the name of the root domain, the domain is named `mydomain.com`, the NetBIOS name is `MYDOMAIN`, and the hostname is `DC`
+
+**Why the forest matters for security:**
+
+**Interview question it answers:** What's the difference between a domain and a forest?
+
+**My answer:**
+
+**What I got wrong at first:**
 
 **Source(s):**
 
