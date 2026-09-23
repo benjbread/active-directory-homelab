@@ -24,8 +24,8 @@ Step-by-step record of building a Windows Server Active Directory environment in
 **Domain controller**
 - [X] 03 – Create the DC virtual machine
 - [X] 04 – Install Windows Server and Guest Additions
-- [ ] 05 – Configure network adapters, static IP, and server name
-- [ ] 06 – Install AD DS and promote to domain controller
+- [X] 05 – Configure network adapters, static IP, and server name
+- [X] 06 – Install AD DS and promote to domain controller
 - [ ] 07 – Create admin OU and domain admin account
 - [ ] 08 – Install and configure RAS/NAT
 - [ ] 09 – Install and configure DHCP
@@ -252,6 +252,64 @@ The `ipconfig /all` fields a help desk tech reads first when a user says "the in
 1. Media State: This will say "Media disconnected" if the cable is unplugged or WiFi is off.
 2. IPv4 Address: A 169.254.x.x means the device cannot reach the DHCP server to get a valid lease.
 3. Default Gateway: If this is empty the computer has no path to send traffic outside the local private network.
+
+---
+
+## Step 06 – Install AD DS and promote to domain controller
+
+**Date: 9/22/2026**
+**Time spent: 30 Minutes**
+
+**Goal:** Install the Active Directory Domain Services role and promote the server to a domain controller for a new forest, mydomain.com.
+
+**What I did:**
+1. Took a snapshot named "Before AD DS."
+2. Opened Server Manager and select "Add roles and features" option.
+3. Added Active Directory Domain Services role and install to DC.
+4. Promoted DC to domain controller and added new forest "mydomain.com" and DRSM password, NetBIOS name autofills to "MYDOMAIN".
+5. Verified with `whoami` and `nslookup -type=SRV _ldap._tcp.dc._msdcs.mydomain.com`.
+
+**Why it matters (my own words):**
+<!-- What does promoting a server to a DC actually give me? Why did DNS install automatically alongside AD DS? What is the DSRM password for? -->
+Promoting to a DC allows me to run Active Directory and its services, like authenticating users, locating computers by name, applying group policies, discovering local services, and storing certain config data. DNS is automatically installed alongside it and it what allows us to resolve computer names to addresses. We also set a DSRM (Directory Services Restore Mode) password since now our user account lives on the AD not the server so if it ever goes offline we still need a way to get in and attempt to restore it.
+
+**Proof:**
+- `screenshots/step06-whoami-srv.png`
+- `screenshots/step06-server-manager.png`
+- `screenshots/step06-multihomed-fix.png`
+
+**Problems & fixes:**
+**Problem 1: the DNS delegation warning**
+- **Symptom:** During the promotion to domain controller, a warning says a delegation for this DNS can't be created.
+- **Cause:** A delegation is a pointer from a parent DNS zone to yours. So the parent of mydomain.com is the real .com zone which I don't control.
+- **Fix:** None needed for the lab, but a real company avoids it by using a domain they own or an internal-only name.
+
+**Problem 2: the multi-homed DC**
+- **Symptom:** nslookup shows dc.mydomain.com resolving to both 172.16.0.1 and 10.0.2.15.
+- **Cause:** By default, Windows registers every adapter's IP in DNS. Since my DC has two adapters, both got registered, and DNS hands them out in rotation.
+- **Fix:** 1. Uncheck "Register this connection's addresses in DNS" for the unwanted adapter.
+2. Limit the DNS server to the internal IP in the Server Manager by going to DNS properties for DC.
+3. Delete record of host with wrong IP to clear stale records.
+  
+
+**What I got wrong at first → what I learned:**
+1. **What changed about the Administrator account after promotion**
+   - **I thought:** I stated it was because the AD DS role/features were added but that's the cause not effect.
+   - **Actually:** Before it was stored in the server but was added to the domain, now it lives in domain
+   - **Why it matters:** Now that its stored in the domain, if the domain were to become unreachable for whatever reason then we now need the DSRM password to get in since we can't access the admin account.
+
+**Help desk / security connection:**
+<!-- The nslookup SRV command is the exact check for the "AD DC could not be contacted" error. What does it prove if it returns the DC? -->
+`nslookup -type=SRV _ldap._tcp.dc._msdcs.[YourDomain].[Extension]` 
+
+`nslookup -type=SRV`: Instructs the system to query DNS specifically for Service records.
+`_ldap`: The name of the service you are looking for (Lightweight Directory Access Protocol).
+`_tcp`: The transport protocol used by the service.
+`dc`: dc is a fixed label meaning "domain controllers".
+`_msdcs`: A Microsoft-specific DNS zone used by Active Directory for internal locator services (Microsoft Domain Controller Service).
+`[YourDomain].[Extension]`: Placeholder for your organization's internal Active Directory domain name (in my case `mydomain.com`).
+
+If DNS passed the test, you now know DNS is not the reason the DC cannot be contacted. The "AD DC could not be contacted" error is now almost certainly being caused by a network, protocol, or authentication barrier between the client and that specific DC host. If it fails, then you know DNS name resolution for Active Directory isn't working properly.
 
 ---
 
